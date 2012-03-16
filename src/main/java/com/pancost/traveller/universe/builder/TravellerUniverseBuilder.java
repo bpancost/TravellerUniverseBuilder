@@ -83,11 +83,11 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
             for(Node planet: planetList){
                 int modifier = 0;
                 Node starportNode = planet.getSingleRelationship(PlanetRelationshipTypes.STARPORT, Direction.BOTH).getOtherNode(planet);
-                if(starportNode.getProperty(STARPORT_QUALITY).equals("Excellent")){
+                if(starportNode.getProperty(PlanetProperties.STARPORT_QUALITY.getProperty()).equals("Excellent")){
                     ++modifier;
                 }
                 Node techNode = planet.getSingleRelationship(PlanetRelationshipTypes.TECH_LEVEL, Direction.BOTH).getOtherNode(planet);
-                String techDesignation = (String)techNode.getProperty(TECH_LEVEL_DESIGNATION);
+                String techDesignation = (String)techNode.getProperty(PlanetProperties.TECH_LEVEL_DESIGNATION.getProperty());
                 if(techDesignation.equals("Average Stellar") || techDesignation.equals("High Stellar")){
                     ++modifier;
                 }
@@ -95,7 +95,7 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
                     modifier += 2;
                 }
                 Node sizeNode = planet.getSingleRelationship(PlanetRelationshipTypes.SIZE, Direction.BOTH).getOtherNode(planet);
-                if(Double.parseDouble((String)sizeNode.getProperty(SURFACE_GRAVITY)) >= 1.4){
+                if(Double.parseDouble((String)sizeNode.getProperty(PlanetProperties.SURFACE_GRAVITY.getProperty())) >= 1.4){
                     ++modifier;
                 }
                 int num_shifts = Dice.quickRoll(1, 3, modifier);
@@ -103,10 +103,7 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
                 for(int i = 0; i < num_shifts; i++){
                     Node destinationPlanet;
                     do{
-                        int index = (new Double(Math.round(Math.random()*NUM_PLANETS))).intValue();
-                        if(index == NUM_PLANETS){
-                            --index;
-                        }
+                        int index = (new Double(Math.floor(Math.random()*NUM_PLANETS))).intValue();
                         destinationPlanet = planetList.get(index);
                     }while(planet.equals(destinationPlanet));//This guarantees that they don't go back to the same place. Maybe I would want that though?
 
@@ -331,7 +328,7 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
             }
 
             String designation = starportClass + planetSizeIndex + atmosphereIndex + hydrographicsIndex + populationIndex + governmentIndex + lawRoll + "-" + techLevelRoll;
-            planet.setProperty(DESIGNATION, designation);
+            planet.setProperty(PlanetProperties.DESIGNATION.getProperty(), designation);
             tx.success();
         }finally{
             tx.finish();

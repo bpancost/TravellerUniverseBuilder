@@ -23,39 +23,67 @@ public interface TravellerConstants {
         Shift
     }
 
-    //PLANET CONSTANTS
-    public final String DESIGNATION = "DESIGNATION";
-    public final String WORLD_SIZE = "WORLD_SIZE";
-    public final String SURFACE_GRAVITY = "SURFACE_GRAVITY";
-    public final String ATMOSPHERE = "ATMOSPHERE";
-    public final String PRESSURE = "PRESSURE";
-    public final String SURVIVAL_GEAR_REQUIRED = "SURVIVAL_GEAR_REQUIRED";
-    public final String AVERAGE_TEMPERATURE = "AVERAGE_TEMPERATURE";
-    public final String TEMPERATURE_TYPE = "TEMPERATURE_TYPE";
-    public final String TEMPERATURE_DESCRIPTION = "TEMPERATURE_DESCRIPTION";
-    public final String HYDROGRAPHIC_PERCENTAGE = "HYDROGRAPHIC_PERCENTAGE";
-    public final String HYDROGRAPHIC_DESCRIPTION = "HYDROGRAPHIC_DESCRIPTION";
-    public final String POPULATION_RANGE = "POPULATION_RANGE";
-    public final String POPULATION_DESCRIPTION = "POPULATION_DESCRIPTION";
-    public final String GOVERNMENT_TYPE = "GOVERNMENT_TYPE";
-    public final String GOVERNMENT_DESCRIPTION = "GOVERNMENT_DESCRIPTION";
-    public final String GOVERNMENT_EXAMPLES = "GOVERNMENT_EXAMPLES";
-    public final String GOVERNMENT_COMMON_CONTRABAND = "GOVERNMENT_COMMON_CONTRABAND";
-    public final String LAW_WEAPONS = "LAW_WEAPONS";
-    public final String LAW_DRUGS = "LAW_DRUGS";
-    public final String LAW_INFORMATION = "LAW_INFORMATION";
-    public final String LAW_TECHNOLOGY = "LAW_TECHNOLOGY";
-    public final String LAW_TRAVELLERS = "LAW_TRAVELLERS";
-    public final String LAW_PSIONICS = "LAW_PSIONICS";
-    public final String STARPORT_QUALITY = "STARPORT_QUALITY";
-    public final String STARPORT_BERTHING_COST = "STARPORT_BERTHING_COST";
-    public final String STARPORT_FUEL = "STARPORT_FUEL";
-    public final String STARPORT_FACILITIES = "STARPORT_FACILITIES";
-    public final String STARPORT_BASES = "STARPORT_BASES";
-    public final String TECH_LEVEL_DESIGNATION = "TECH_LEVEL_DESIGNATION";
-    public final String TECH_LEVEL_DESCRIPTION = "TECH_LEVEL_DESCRIPTION";
+    /**
+     * Planet Constants
+     */
+    public enum PlanetProperties{
+        DESIGNATION("DESIGNATION"),
+        WORLD_SIZE("WORLD_SIZE"),
+        SURFACE_GRAVITY("SURFACE_GRAVITY"),
+        ATMOSPHERE("ATMOSPHERE"),
+        PRESSURE("PRESSURE"),
+        SURVIVAL_GEAR_REQUIRED("SURVIVAL_GEAR_REQUIRED"),
+        AVERAGE_TEMPERATURE("AVERAGE_TEMPERATURE"),
+        TEMPERATURE_TYPE("TEMPERATURE_TYPE"),
+        TEMPERATURE_DESCRIPTION("TEMPERATURE_DESCRIPTION"),
+        HYDROGRAPHIC_PERCENTAGE("HYDROGRAPHIC_PERCENTAGE"),
+        HYDROGRAPHIC_DESCRIPTION("HYDROGRAPHIC_DESCRIPTION"),
+        POPULATION_RANGE("POPULATION_RANGE"),
+        POPULATION_DESCRIPTION("POPULATION_DESCRIPTION"),
+        GOVERNMENT_TYPE("GOVERNMENT_TYPE"),
+        GOVERNMENT_DESCRIPTION("GOVERNMENT_DESCRIPTION"),
+        GOVERNMENT_EXAMPLES("GOVERNMENT_EXAMPLES"),
+        GOVERNMENT_COMMON_CONTRABAND("GOVERNMENT_COMMON_CONTRABAND"),
+        LAW_WEAPONS("LAW_WEAPONS"),
+        LAW_DRUGS("LAW_DRUGS"),
+        LAW_INFORMATION("LAW_INFORMATION"),
+        LAW_TECHNOLOGY("LAW_TECHNOLOGY"),
+        LAW_TRAVELLERS("LAW_TRAVELLERS"),
+        LAW_PSIONICS("LAW_PSIONICS"),
+        STARPORT_QUALITY("STARPORT_QUALITY"),
+        STARPORT_BERTHING_COST("STARPORT_BERTHING_COST"),
+        STARPORT_FUEL("STARPORT_FUEL"),
+        STARPORT_FACILITIES("STARPORT_FACILITIES"),
+        STARPORT_BASES("STARPORT_BASES"),
+        TECH_LEVEL_DESIGNATION("TECH_LEVEL_DESIGNATION"),
+        TECH_LEVEL_DESCRIPTION("TECH_LEVEL_DESCRIPTION");
+    
+        private String property;
+        
+        private PlanetProperties(String property){
+            this.property = property;
+        }
+        
+        public String getProperty(){
+            return this.property;
+        }
+    }
 
-    //SHIFT CONSTANTS
-    public final String SHIFT_STABILITY = "SHIFT_STABILITY";
-    public final String SHIFT_DANGER = "SHIFT_DANGER";
+    /**
+     * Shift Constants
+     */
+    public enum ShiftProperties{
+        SHIFT_STABILITY("SHIFT_STABILITY"),
+        SHIFT_DANGER("SHIFT_DANGER");
+        
+        private String property;
+        
+        private ShiftProperties(String property){
+            this.property = property;
+        }
+        
+        public String getProperty(){
+            return this.property;
+        }
+    }
 }
