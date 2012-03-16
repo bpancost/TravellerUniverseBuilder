@@ -1,26 +1,57 @@
 package com.pancost.traveller.universe.builder;
 
-import org.neo4j.graphdb.RelationshipType;
-
 /**
  *
  * @author Brandon Pancost
  */
 public interface TravellerConstants {
 
-    public enum UtilityTypes implements RelationshipType
+    public enum UtilityTypes
     {
-        ROOT, PLANET
+        Root("Root"), Planet("Planet");
+                    
+        private String property;
+        
+        private UtilityTypes(String property){
+            this.property = property;
+        }
+        
+        public String getProperty(){
+            return this.property;
+        }
     }
 
-    public enum PlanetRelationshipTypes implements RelationshipType
+    public enum PlanetRelationshipTypes
     {
-        SIZE, ATMOSPHERE, TEMPERATURE, HYDROGRAPHICS, POPULATION, GOVERNMENT, LAW, STARPORT, TECH_LEVEL
+        Size("Size"), Atmosphere("Atmosphere"), Temperature("Temperature"),
+        Hydrographics("Hydrographics"), Population("Population"),
+        Government("Government"), Law("Law"), Starport("Starport"),
+        TechLevel("Tech Level");
+                    
+        private String property;
+        
+        private PlanetRelationshipTypes(String property){
+            this.property = property;
+        }
+        
+        public String getProperty(){
+            return this.property;
+        }
     }
 
-    public enum ShiftTypes implements RelationshipType
+    public enum ShiftTypes
     {
-        Shift
+        Shift("Shift");
+            
+        private String property;
+        
+        private ShiftTypes(String property){
+            this.property = property;
+        }
+        
+        public String getProperty(){
+            return this.property;
+        }
     }
 
     /**
