@@ -2,7 +2,6 @@ package com.pancost.traveller.universe.builder;
 
 import com.pancost.dice.Dice;
 import com.pancost.traveller.universe.frames.*;
-import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.frames.FramesManager;
@@ -53,6 +52,7 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
         
         graph.startTransaction();
         PlanetList planets = framesManager.createFramedVertex(PlanetList.class);
+        planets.setIndexed("YES");
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         
         for(int i = 0; i < NUM_PLANETS; ++i){
