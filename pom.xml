@@ -43,5 +43,10 @@
       <artifactId>blueprints-neo4j-graph</artifactId>
       <version>1.2</version>
     </dependency>
+    <dependency>
+      <groupId>com.tinkerpop</groupId>
+      <artifactId>frames</artifactId>
+      <version>0.7</version>
+    </dependency>
   </dependencies>
 </project>

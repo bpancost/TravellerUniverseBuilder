@@ -1,29 +1,25 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package com.pancost.traveller.universe.builder;
 
-import java.util.ArrayList;
 import com.pancost.dice.Dice;
-import com.tinkerpop.blueprints.pgm.Edge;
+import com.pancost.traveller.universe.frames.*;
+import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
+import com.tinkerpop.frames.FramesManager;
 
 /**
  *
- * @author Brandon
+ * @author Brandon Pancost
  */
 public class TravellerUniverseBuilder extends TravellerUniverse{
 
     private static final int NUM_PLANETS = 50;
-    private ArrayList<Vertex> planetList = new ArrayList<>();
-    private TransactionalGraph graph;
+    private Neo4jGraph graph;
+    private FramesManager framesManager;
 
     public TravellerUniverseBuilder(){
         graph = new Neo4jGraph("C:/traveller/graphdb");
+        framesManager = new FramesManager(graph);
 
         System.out.println("Cleaning up before creating a new universe.");
         graph.clear();
@@ -52,56 +48,50 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
 
         System.out.println("Creating new planets");
         
+        //Iterable<PlanetAtmosphere> atmospheres = framesManager.frameVertices(Index.VERTICES, "atmosphere", "None", PlanetAtmosphere.class);
+        //Just seeing if this thing works. Don't mind me...
+        
         graph.startTransaction();
-        Vertex root = graph.addVertex(UtilityTypes.Root.getProperty());
-        
-        Vertex planets = graph.addVertex(UtilityTypes.Planet.getProperty());
-        
-        graph.addEdge("RootToPlanets", root, planets, UtilityTypes.Root.getProperty());
+        PlanetList planets = framesManager.createFramedVertex(PlanetList.class);
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         
         for(int i = 0; i < NUM_PLANETS; ++i){
-            Vertex planet = generatePlanet(graph);
+            Planet planet = generatePlanet(graph);
             graph.startTransaction();
-            graph.addEdge(null, planets, planet, UtilityTypes.Planet.getProperty());
+            planets.addPlanetToList(planet);
             graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            planetList.add(planet);
         }
 
         System.out.println("Creating trade routes");
         
         graph.startTransaction();
-        for(Vertex planet: planetList){
+        for(Planet planet: planets.getPlanetList()){
             int modifier = 0;
-            Edge toStarportNode = planet.getOutEdges(PlanetRelationshipTypes.Starport.getProperty()).iterator().next();
-            Vertex starportNode = toStarportNode.getInVertex();
-            if(starportNode.getProperty(PlanetProperties.STARPORT_QUALITY.getProperty()).equals("Excellent")){
+            PlanetStarport planetStarport = planet.getPlanetStarport();
+            if(planetStarport.getQuality().equals("Excellent")){
                 ++modifier;
             }
-            Edge toTechNode = planet.getOutEdges(PlanetRelationshipTypes.TechLevel.getProperty()).iterator().next();
-            Vertex techNode = toTechNode.getInVertex();
-            String techDesignation = (String)techNode.getProperty(PlanetProperties.TECH_LEVEL_DESIGNATION.getProperty());
+            PlanetTechLevel planetTechLevel = planet.getPlanetTechLevel();
+            String techDesignation = planetTechLevel.getDesignation();
             if(techDesignation.equals("Average Stellar") || techDesignation.equals("High Stellar")){
                 ++modifier;
             }
             if(techDesignation.equals("Unknown")){
                 modifier += 2;
             }
-            Edge toSizeNode = planet.getOutEdges(PlanetRelationshipTypes.Size.getProperty()).iterator().next();
-            Vertex sizeNode = toSizeNode.getInVertex();
-            if(Double.parseDouble((String)sizeNode.getProperty(PlanetProperties.SURFACE_GRAVITY.getProperty())) >= 1.4d){
+            PlanetSize planetSize = planet.getPlanetSize();
+            if(Double.parseDouble((String)planetSize.getSurfaceGravity()) >= 1.4d){
                 ++modifier;
             }
             int num_shifts = Dice.quickRoll(1, 3, modifier);
 
             for(int i = 0; i < num_shifts; i++){
-                Vertex destinationPlanet;
+                Planet destinationPlanet;
                 do{
                     int index = (new Double(Math.floor(Math.random()*NUM_PLANETS))).intValue();
-                    destinationPlanet = planetList.get(index);
+                    destinationPlanet = planets.getPlanetList().toArray(new Planet[0])[index];
                 }while(planet.equals(destinationPlanet));//This guarantees that they don't go back to the same place. Maybe I would want that though?
-                
-                Edge shift = graph.addEdge(null, planet, destinationPlanet, ShiftTypes.Shift.getProperty());
+                planet.addShiftPlanet(destinationPlanet);
             }
         }
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
@@ -110,11 +100,9 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
 
     
 
-    private Vertex generatePlanet(TransactionalGraph graph) {
-        Vertex planet;
-        
+    private Planet generatePlanet(TransactionalGraph graph) {
         graph.startTransaction();
-        planet = graph.addVertex(null);
+        Planet planet = framesManager.createFramedVertex(Planet.class);
         int planetSizeRoll = generatePlanetSize(planet);
         int atmosphereRoll = generatePlanetAtmosphere(planetSizeRoll, planet);
         int temperatureRoll = generatePlanetTemperature(atmosphereRoll, planet);
@@ -319,13 +307,13 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
         }
 
         String designation = starportClass + planetSizeIndex + atmosphereIndex + hydrographicsIndex + populationIndex + governmentIndex + lawRoll + "-" + techLevelRoll;
-        planet.setProperty(PlanetProperties.DESIGNATION.getProperty(), designation);
+        planet.setDesignation(designation);
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         
         return planet;
     }
 
-    private int generatePlanetTechLevel(int tldm, int atmosphereRoll, Vertex planet) {
+    private int generatePlanetTechLevel(int tldm, int atmosphereRoll, Planet planet) {
         int techLevelRoll = Dice.quickRoll(1, 6, tldm);
         switch (atmosphereRoll) {
             case 0:
@@ -365,17 +353,18 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
         if(techLevelRoll < 0){
             techLevelRoll = 0;
         }
-        Edge relationship = graph.addEdge(null, planet, techLevel[techLevelRoll], PlanetRelationshipTypes.TechLevel.getProperty());
+        
+        planet.setPlanetTechLevel(techLevel[techLevelRoll]);
         return techLevelRoll;
     }
 
-    private int generatePlanetStarport(Vertex planet) {
+    private int generatePlanetStarport(Planet planet) {
         int starportRoll = Dice.quickRoll(2, 6);
-        Edge relationship = graph.addEdge(null, planet, starport[starportRoll], PlanetRelationshipTypes.Starport.getProperty());
+        planet.setPlanetStarport(starport[starportRoll]);
         return starportRoll;
     }
 
-    private int generatePlanetLaw(int governmentRoll, Vertex planet) {
+    private int generatePlanetLaw(int governmentRoll, Planet planet) {
         int lawRoll = Dice.quickRoll(2, 6, -7) + governmentRoll;
         if(lawRoll > 9){
             lawRoll = 9;
@@ -383,11 +372,11 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
             lawRoll = 0;
         }
         
-        Edge relationship = graph.addEdge(null, planet, law[lawRoll], PlanetRelationshipTypes.Law.getProperty());
+        planet.setPlanetLaw(law[lawRoll]);
         return lawRoll;
     }
 
-    private int generatePlanetGovernment(int populationRoll, Vertex planet) {
+    private int generatePlanetGovernment(int populationRoll, Planet planet) {
         int governmentRoll =  Dice.quickRoll(2, 6, -7) + populationRoll;
         if(governmentRoll < 0){
             governmentRoll = 0;
@@ -395,17 +384,18 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
         if(governmentRoll > 13){
             governmentRoll = 13;
         }
-        Edge relationship = graph.addEdge(null, planet, government[governmentRoll], PlanetRelationshipTypes.Government.getProperty());
+        
+        planet.setPlanetGovernment(government[governmentRoll]);
         return governmentRoll;
     }
 
-    private int generatePlanetPopulation(Vertex planet) {
+    private int generatePlanetPopulation(Planet planet) {
         int populationRoll =  Dice.quickRoll(2, 6, -2);
-        Edge relationship = graph.addEdge(null, planet, population[populationRoll], PlanetRelationshipTypes.Population.getProperty());
+        planet.setPlanetPopulation(population[populationRoll]);
         return populationRoll;
     }
 
-    private int generatePlanetHydrographics(int planetSizeRoll, int atmosphereRoll, int temperatureRoll, Vertex planet) {
+    private int generatePlanetHydrographics(int planetSizeRoll, int atmosphereRoll, int temperatureRoll, Planet planet) {
         int hydroGraphicsRoll;
         if (planetSizeRoll == 0 || planetSizeRoll == 1) {
             hydroGraphicsRoll = 0;
@@ -438,11 +428,12 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
         if(hydroGraphicsRoll > 10){
             hydroGraphicsRoll = 10;
         }
-        Edge relationship = graph.addEdge(null, planet, hydrographics[hydroGraphicsRoll], PlanetRelationshipTypes.Hydrographics.getProperty());
+        
+        planet.setPlanetHydrographics(hydrographics[hydroGraphicsRoll]);
         return hydroGraphicsRoll;
     }
 
-    private int generatePlanetTemperature(int atmosphereRoll, Vertex planet) {
+    private int generatePlanetTemperature(int atmosphereRoll, Planet planet) {
         int temperatureRoll;
         switch (atmosphereRoll) {
             case 0:
@@ -479,22 +470,24 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
                 System.err.println("Bad value for atmosphere: " + atmosphereRoll);
                 return -1;
         }
-        Edge relationship = graph.addEdge(null, planet, temperature[temperatureRoll], PlanetRelationshipTypes.Temperature.getProperty());
+        
+        planet.setPlanetTemperature(temperature[temperatureRoll]);
         return temperatureRoll;
     }
 
-    private int generatePlanetAtmosphere(int planetSizeRoll, Vertex planet) {
+    private int generatePlanetAtmosphere(int planetSizeRoll, Planet planet) {
         int atmosphereRoll = Dice.quickRoll(2, 6, -7) + planetSizeRoll;
         if (atmosphereRoll < 0) {
             atmosphereRoll = 0;
         }
-        Edge relationship = graph.addEdge(null, planet, atmosphere[atmosphereRoll], PlanetRelationshipTypes.Atmosphere.getProperty());
+        
+        planet.setPlanetAtmosphere(atmosphere[atmosphereRoll]);
         return atmosphereRoll;
     }
 
-    private int generatePlanetSize(Vertex planet) {
+    private int generatePlanetSize(Planet planet) {
         int planetSize = Dice.quickRoll(2, 6, -2);
-        Edge relationship = graph.addEdge(null, planet, size[planetSize], PlanetRelationshipTypes.Size.getProperty());
+        planet.setPlanetSize(size[planetSize]);
         return planetSize;
     }
 
