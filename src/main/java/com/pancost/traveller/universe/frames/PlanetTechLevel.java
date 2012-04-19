@@ -1,12 +1,13 @@
 package com.pancost.traveller.universe.frames;
 
 import com.tinkerpop.frames.Property;
+import com.tinkerpop.frames.VertexFrame;
 
 /**
  *
  * @author Brandon Pancost
  */
-public interface PlanetTechLevel {
+public interface PlanetTechLevel extends VertexFrame {
     @Property("designation")
     public void setDesignation(String designation);
     @Property("designation")

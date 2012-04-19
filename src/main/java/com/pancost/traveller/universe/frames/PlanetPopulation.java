@@ -1,12 +1,13 @@
 package com.pancost.traveller.universe.frames;
 
 import com.tinkerpop.frames.Property;
+import com.tinkerpop.frames.VertexFrame;
 
 /**
  *
  * @author Brandon Pancost
  */
-public interface PlanetPopulation {    
+public interface PlanetPopulation extends VertexFrame {    
     @Property("populationRange")
     public void setPopulationRange(String populationRange);
     @Property("populationRange")

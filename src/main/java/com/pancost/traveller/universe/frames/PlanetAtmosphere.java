@@ -1,12 +1,13 @@
 package com.pancost.traveller.universe.frames;
 
 import com.tinkerpop.frames.Property;
+import com.tinkerpop.frames.VertexFrame;
 
 /**
  *
  * @author Brandon Pancost
  */
-public interface PlanetAtmosphere {
+public interface PlanetAtmosphere extends VertexFrame {
     @Property("atmosphere")
     public void setAtmosphere(String atmosphere);
     @Property("atmosphere")

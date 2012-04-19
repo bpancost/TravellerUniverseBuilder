@@ -1,12 +1,13 @@
 package com.pancost.traveller.universe.frames;
 
 import com.tinkerpop.frames.Property;
+import com.tinkerpop.frames.VertexFrame;
 
 /**
  *
  * @author Brandon Pancost
  */
-public interface PlanetStarport {
+public interface PlanetStarport extends VertexFrame {
     @Property("quality")
     public void setQuality(String quality);
     @Property("quality")

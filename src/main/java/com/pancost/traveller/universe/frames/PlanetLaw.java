@@ -1,12 +1,13 @@
 package com.pancost.traveller.universe.frames;
 
 import com.tinkerpop.frames.Property;
+import com.tinkerpop.frames.VertexFrame;
 
 /**
  *
  * @author Brandon Pancost
  */
-public interface PlanetLaw {
+public interface PlanetLaw extends VertexFrame {
     @Property("weaponRestrictions")
     public void setWeaponRestrictions(String weaponRestrictions);
     @Property("weaponRestrictions")

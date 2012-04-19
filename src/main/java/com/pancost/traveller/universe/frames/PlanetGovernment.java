@@ -1,12 +1,13 @@
 package com.pancost.traveller.universe.frames;
 
 import com.tinkerpop.frames.Property;
+import com.tinkerpop.frames.VertexFrame;
 
 /**
  *
  * @author Brandon Pancost
  */
-public interface PlanetGovernment {
+public interface PlanetGovernment extends VertexFrame {
     @Property("type")
     public void setType(String type);
     @Property("type")

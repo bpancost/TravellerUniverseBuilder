@@ -2,13 +2,14 @@ package com.pancost.traveller.universe.frames;
 
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.Relation;
+import com.tinkerpop.frames.VertexFrame;
 import java.util.Collection;
 
 /**
  *
  * @author Brandon Pancost
  */
-public interface PlanetList {
+public interface PlanetList extends VertexFrame {
     @Property("indexed")
     public void setIndexed(String indexed);
     @Property("indexed")

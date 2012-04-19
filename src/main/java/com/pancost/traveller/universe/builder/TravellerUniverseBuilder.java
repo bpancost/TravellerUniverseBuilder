@@ -12,7 +12,7 @@ import com.tinkerpop.frames.FramesManager;
  */
 public class TravellerUniverseBuilder extends TravellerUniverse{
 
-    private static final int NUM_PLANETS = 50;
+    private static final int NUM_PLANETS = 100;
     private Neo4jGraph graph;
     private FramesManager framesManager;
 
@@ -46,9 +46,6 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
         generateTechLevelDescriptorNodes(graph);
 
         System.out.println("Creating new planets");
-        
-        //Iterable<PlanetAtmosphere> atmospheres = framesManager.frameVertices(Index.VERTICES, "atmosphere", "None", PlanetAtmosphere.class);
-        //Just seeing if this thing works. Don't mind me...
         
         graph.startTransaction();
         PlanetList planets = framesManager.createFramedVertex(PlanetList.class);
@@ -86,12 +83,13 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
             int num_shifts = Dice.quickRoll(1, 3, modifier);
 
             for(int i = 0; i < num_shifts; i++){
-                Planet destinationPlanet;
+                Planet otherPlanet;
                 do{
                     int index = (new Double(Math.floor(Math.random()*NUM_PLANETS))).intValue();
-                    destinationPlanet = planets.getPlanetList().toArray(new Planet[0])[index];
-                }while(planet.equals(destinationPlanet));//This guarantees that they don't go back to the same place. Maybe I would want that though?
-                planet.addShiftPlanet(destinationPlanet);
+                    otherPlanet = planets.getPlanetList().toArray(new Planet[0])[index];
+                }while(planet.equals(otherPlanet));//This guarantees that they don't go back to the same place. Maybe I would want that though?
+                planet.addShiftPlanet(otherPlanet);
+                otherPlanet.addShiftPlanet(planet);
             }
         }
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);

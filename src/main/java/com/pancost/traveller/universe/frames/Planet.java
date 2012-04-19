@@ -3,13 +3,14 @@ package com.pancost.traveller.universe.frames;
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.Relation;
+import com.tinkerpop.frames.VertexFrame;
 import java.util.Collection;
 
 /**
  *
  * @author Brandon Pancost
  */
-public interface Planet {
+public interface Planet extends VertexFrame {
     @Property("designation")
     public void setDesignation(String designation);
     @Property("designation")
@@ -64,7 +65,7 @@ public interface Planet {
     public PlanetTechLevel getPlanetTechLevel();
     @Relation(label="planetTechLevel")
     public void setPlanetTechLevel(PlanetTechLevel planetTechLevel);
-  
+    
     @Relation(label="shiftPlanets")
     public Collection<Planet> getShiftPlanets();
     @Relation(label="shiftPlanets")
@@ -72,6 +73,6 @@ public interface Planet {
     @Relation(label="shiftPlanets")
     public void removeShiftPlanet(Planet planet);
   
-    @Adjacency(label="shift")
+    @Adjacency(label="shiftPlanets")
     public Collection<Shift> getShifts();
 }

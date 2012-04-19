@@ -1,14 +1,13 @@
 package com.pancost.traveller.universe.frames;
 
-import com.tinkerpop.frames.Property;
-import com.tinkerpop.frames.Relation;
+import com.tinkerpop.frames.*;
 import java.util.Collection;
 
 /**
  *
  * @author Brandon Pancost
  */
-public interface Shift {
+public interface Shift extends EdgeFrame {
     @Property("name")
     public void setName(String name);
     @Property("name")
@@ -24,10 +23,8 @@ public interface Shift {
     @Property("connection")
     public String getConnection();
     
-    @Relation(label="shiftPlanets")
-    public Collection<Planet> getShiftPlanets();
-    @Relation(label="shiftPlanets")
-    public void addShiftPlanet(Planet planet);
-    @Relation(label="shiftPlanets")
-    public void removeShiftPlanet(Planet planet);
+    @Domain()
+    public Planet getFromPlanet();
+    @Range()
+    public Planet getToPlanet();
 }

@@ -1,12 +1,13 @@
 package com.pancost.traveller.universe.frames;
 
 import com.tinkerpop.frames.Property;
+import com.tinkerpop.frames.VertexFrame;
 
 /**
  *
  * @author Brandon Pancost
  */
-public interface PlanetHydrographics {
+public interface PlanetHydrographics extends VertexFrame {
     @Property("percentage")
     public void setPercentage(String percentage);
     @Property("percentage")
