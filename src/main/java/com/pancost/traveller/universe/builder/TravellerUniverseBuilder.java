@@ -12,7 +12,7 @@ import com.tinkerpop.frames.FramesManager;
  */
 public class TravellerUniverseBuilder extends TravellerUniverse{
 
-    private static final int NUM_PLANETS = 100;
+    private static final int NUM_PLANETS = 500;
     private Neo4jGraph graph;
     private FramesManager framesManager;
 
@@ -87,7 +87,9 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
                 do{
                     int index = (new Double(Math.floor(Math.random()*NUM_PLANETS))).intValue();
                     otherPlanet = planets.getPlanetList().toArray(new Planet[0])[index];
-                }while(planet.equals(otherPlanet));//This guarantees that they don't go back to the same place. Maybe I would want that though?
+                }while(planet.equals(otherPlanet) &&
+                       planet.getShiftPlanets().contains(otherPlanet) &&
+                       otherPlanet.getShiftPlanets().contains(planet));//This guarantees that they don't go back to the same place. Maybe I would want that though?
                 planet.addShiftPlanet(otherPlanet);
                 otherPlanet.addShiftPlanet(planet);
             }
