@@ -1,10 +1,9 @@
 package com.pancost.traveller.universe.frames;
 
 import com.tinkerpop.frames.Adjacency;
+import com.tinkerpop.frames.Incidence;
 import com.tinkerpop.frames.Property;
-import com.tinkerpop.frames.Relation;
 import com.tinkerpop.frames.VertexFrame;
-import java.util.Collection;
 
 /**
  *
@@ -21,58 +20,58 @@ public interface Planet extends VertexFrame {
     @Property("name")
     public String getName();
   
-    @Relation(label="planetSize")
+    @Adjacency(label="planetSize")
     public PlanetSize getPlanetSize();
-    @Relation(label="planetSize")
+    @Adjacency(label="planetSize")
     public void setPlanetSize(PlanetSize planetSize);
   
-    @Relation(label="planetAtmosphere")
+    @Adjacency(label="planetAtmosphere")
     public PlanetAtmosphere getPlanetAtmosphere();
-    @Relation(label="planetAtmosphere")
+    @Adjacency(label="planetAtmosphere")
     public void setPlanetAtmosphere(PlanetAtmosphere planetAtmosphere);
   
-    @Relation(label="planetTemperature")
+    @Adjacency(label="planetTemperature")
     public PlanetTemperature getPlanetTemperature();
-    @Relation(label="planetTemperature")
+    @Adjacency(label="planetTemperature")
     public void setPlanetTemperature(PlanetTemperature planetTemperature);
   
-    @Relation(label="planetHydrographics")
+    @Adjacency(label="planetHydrographics")
     public PlanetHydrographics getPlanetHydrographics();
-    @Relation(label="planetHydrographics")
+    @Adjacency(label="planetHydrographics")
     public void setPlanetHydrographics(PlanetHydrographics planetHydrographics);
   
-    @Relation(label="planetPopulation")
+    @Adjacency(label="planetPopulation")
     public PlanetPopulation getPlanetPopulation();
-    @Relation(label="planetPopulation")
+    @Adjacency(label="planetPopulation")
     public void setPlanetPopulation(PlanetPopulation planetPopulation);
   
-    @Relation(label="planetGovernment")
+    @Adjacency(label="planetGovernment")
     public PlanetGovernment getPlanetGovernment();
-    @Relation(label="planetGovernment")
+    @Adjacency(label="planetGovernment")
     public void setPlanetGovernment(PlanetGovernment planetGovernment);
   
-    @Relation(label="planetLaw")
+    @Adjacency(label="planetLaw")
     public PlanetLaw getPlanetLaw();
-    @Relation(label="planetLaw")
+    @Adjacency(label="planetLaw")
     public void setPlanetLaw(PlanetLaw planetLaw);
   
-    @Relation(label="planetStarport")
+    @Adjacency(label="planetStarport")
     public PlanetStarport getPlanetStarport();
-    @Relation(label="planetStarport")
+    @Adjacency(label="planetStarport")
     public void setPlanetStarport(PlanetStarport planetStarport);
   
-    @Relation(label="planetTechLevel")
+    @Adjacency(label="planetTechLevel")
     public PlanetTechLevel getPlanetTechLevel();
-    @Relation(label="planetTechLevel")
+    @Adjacency(label="planetTechLevel")
     public void setPlanetTechLevel(PlanetTechLevel planetTechLevel);
     
-    @Relation(label="shiftPlanets")
-    public Collection<Planet> getShiftPlanets();
-    @Relation(label="shiftPlanets")
+    @Adjacency(label="shiftPlanets")
+    public Iterable<Planet> getShiftPlanets();
+    @Adjacency(label="shiftPlanets")
     public void addShiftPlanet(Planet planet);
-    @Relation(label="shiftPlanets")
+    @Adjacency(label="shiftPlanets")
     public void removeShiftPlanet(Planet planet);
   
-    @Adjacency(label="shiftPlanets")
-    public Collection<Shift> getShifts();
+    @Incidence(label="shiftPlanets")
+    public Iterable<Shift> getShifts();
 }

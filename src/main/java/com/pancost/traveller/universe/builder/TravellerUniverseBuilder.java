@@ -2,9 +2,11 @@ package com.pancost.traveller.universe.builder;
 
 import com.pancost.dice.Dice;
 import com.pancost.traveller.universe.frames.*;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.frames.FramesManager;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
+import com.tinkerpop.frames.FramedGraph;
 
 /**
  *
@@ -14,51 +16,52 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
 
     private static final int NUM_PLANETS = 500;
     private Neo4jGraph graph;
-    private FramesManager framesManager;
+    private FramedGraph<Neo4jGraph> framedGraph;
 
     public TravellerUniverseBuilder(){
         graph = new Neo4jGraph("C:/traveller/graphdb");
-        framesManager = new FramesManager(graph);
+        framedGraph = new FramedGraph<>(graph);
 
         System.out.println("Cleaning up before creating a new universe.");
-        graph.clear();
+        for(Edge edge: graph.getEdges()){
+            graph.removeEdge(edge);
+        }
+        for(Vertex vertex : graph.getVertices()){
+            graph.removeVertex(vertex);
+        }
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        
-        graph.setMaxBufferSize(0);
 
-        System.out.println("Generating Size Descriptors");
         generateSizeDescriptorNodes(graph);
-        System.out.println("Generating Atmosphere Descriptors");
         generateAtmosphereDescriptorNodes(graph);
-        System.out.println("Generating Temperature Descriptors");
         generateTemperatureDescriptorNodes(graph);
-        System.out.println("Generating Hydrographic Descriptors");
         generateHydrographicDescriptorNodes(graph);
-        System.out.println("Generating Population Descriptors");
         generatePopulationDescriptorNodes(graph);
-        System.out.println("Generating Government Descriptors");
         generateGovernmentDescriptorNodes(graph);
-        System.out.println("Generating Law Descriptors");
         generateLawDescriptorNodes(graph);
-        System.out.println("Generating Starport Descriptors");
         generateStarportDescriptorNodes(graph);
-        System.out.println("Generating Tech Level Descriptors");
         generateTechLevelDescriptorNodes(graph);
-
-        System.out.println("Creating new planets");
         
+        PlanetList planets = createPlanets();
+        createShifts(planets);
+        graph.shutdown();
+    }
+
+    private PlanetList createPlanets() {
+        System.out.println("Creating new planets");
         graph.startTransaction();
-        PlanetList planets = framesManager.createFramedVertex(PlanetList.class);
+        PlanetList planets = framedGraph.addVertex(0, PlanetList.class);
         planets.setIndexed("YES");
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        
         for(int i = 0; i < NUM_PLANETS; ++i){
-            Planet planet = generatePlanet(graph);
+            Planet planet = generatePlanet(graph, i+1);//making this a 1-based index
             graph.startTransaction();
             planets.addPlanetToList(planet);
             graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         }
+        return planets;
+    }
 
+    private void createShifts(PlanetList planets) throws NumberFormatException {
         System.out.println("Creating trade routes");
         
         graph.startTransaction();
@@ -83,26 +86,46 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
             int num_shifts = Dice.quickRoll(1, 3, modifier);
 
             for(int i = 0; i < num_shifts; i++){
-                Planet otherPlanet;
+                Planet otherPlanet = null;
+                boolean illegalShift;
                 do{
+                    illegalShift = false;
                     int index = (new Double(Math.floor(Math.random()*NUM_PLANETS))).intValue();
-                    otherPlanet = planets.getPlanetList().toArray(new Planet[0])[index];
-                }while(planet.equals(otherPlanet) &&
-                       planet.getShiftPlanets().contains(otherPlanet) &&
-                       otherPlanet.getShiftPlanets().contains(planet));//This guarantees that they don't go back to the same place. Maybe I would want that though?
+                    int count = 0;
+                    for(Planet p : planets.getPlanetList()){
+                        if(count == index){
+                            otherPlanet = p;//this is ridiculous!
+                            break;//I wish the frames framework had not changed from Collections.
+                        }
+                        ++count;
+                    }
+                    if(planet.equals(otherPlanet)){
+                        illegalShift = true;
+                    }else{
+                        for(Planet p : planet.getShiftPlanets()){
+                            if(p.equals(otherPlanet)){
+                                illegalShift = true;
+                                break;
+                            }
+                        }
+                    }
+                }while(illegalShift);//This guarantees that they don't go back to the same place. Maybe I would want that though?
                 planet.addShiftPlanet(otherPlanet);
                 otherPlanet.addShiftPlanet(planet);
             }
         }
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        graph.shutdown();
+        
+        /*graph.startTransaction();
+        GremlinPipeline gremlin = new GremlinPipeline(graph).out("shiftPlanets");
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);*/
     }
 
     
 
-    private Planet generatePlanet(TransactionalGraph graph) {
+    private Planet generatePlanet(TransactionalGraph graph, int currentPlanetNumber) {
         graph.startTransaction();
-        Planet planet = framesManager.createFramedVertex(Planet.class);
+        Planet planet = framedGraph.addVertex(currentPlanetNumber, Planet.class);
         int planetSizeRoll = generatePlanetSize(planet);
         int atmosphereRoll = generatePlanetAtmosphere(planetSizeRoll, planet);
         int temperatureRoll = generatePlanetTemperature(atmosphereRoll, planet);
@@ -306,7 +329,11 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
                 break;
         }
 
-        String designation = starportClass + planetSizeIndex + atmosphereIndex + hydrographicsIndex + populationIndex + governmentIndex + lawRoll + "-" + techLevelRoll;
+        StringBuilder sb = new StringBuilder(10);
+        sb.append(starportClass).append(planetSizeIndex).append(atmosphereIndex);
+        sb.append(hydrographicsIndex).append(populationIndex).append(governmentIndex);
+        sb.append(lawRoll).append("-").append(techLevelRoll);
+        String designation = sb.toString();
         planet.setDesignation(designation);
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         

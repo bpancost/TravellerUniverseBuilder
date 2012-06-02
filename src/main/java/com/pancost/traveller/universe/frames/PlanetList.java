@@ -1,9 +1,8 @@
 package com.pancost.traveller.universe.frames;
 
+import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Property;
-import com.tinkerpop.frames.Relation;
 import com.tinkerpop.frames.VertexFrame;
-import java.util.Collection;
 
 /**
  *
@@ -15,10 +14,10 @@ public interface PlanetList extends VertexFrame {
     @Property("indexed")
     public String getIndexed();
     
-    @Relation(label="planetList")
-    public Collection<Planet> getPlanetList();
-    @Relation(label="planetList")
+    @Adjacency(label="planetList")
+    public Iterable<Planet> getPlanetList();
+    @Adjacency(label="planetList")
     public void addPlanetToList(Planet planet);
-    @Relation(label="planetList")
+    @Adjacency(label="planetList")
     public void removePlanetFromList(Planet planet);
 }

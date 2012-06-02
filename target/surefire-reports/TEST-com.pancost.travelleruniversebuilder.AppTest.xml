@@ -60,5 +60,5 @@
     <property name="sun.desktop" value="windows"/>
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
-  <testcase time="0.001" classname="com.pancost.travelleruniversebuilder.AppTest" name="testApp"/>
+  <testcase time="0" classname="com.pancost.travelleruniversebuilder.AppTest" name="testApp"/>
 </testsuite>
