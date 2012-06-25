@@ -4,6 +4,7 @@ import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Incidence;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;
+import com.tinkerpop.frames.annotations.gremlin.GremlinGroovy;
 
 /**
  *
@@ -74,4 +75,7 @@ public interface Planet extends VertexFrame {
   
     @Incidence(label="shiftPlanets")
     public Iterable<Shift> getShifts();
+    
+    @GremlinGroovy("_().copySplit(_().out('shiftPlanets'),_().copySplit(_().out('shiftPlanets').out('shiftPlanets'),_().out('shiftPlanets').out('shiftPlanets').out('shiftPlanets')).exhaustMerge).exhaustMerge")
+    public Iterable<Planet> getPlanetsInThreeShifts();
 }

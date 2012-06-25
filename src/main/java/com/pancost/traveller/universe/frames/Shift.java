@@ -1,7 +1,9 @@
 package com.pancost.traveller.universe.frames;
 
-import com.tinkerpop.frames.*;
-import java.util.Collection;
+import com.tinkerpop.frames.Domain;
+import com.tinkerpop.frames.EdgeFrame;
+import com.tinkerpop.frames.Property;
+import com.tinkerpop.frames.Range;
 
 /**
  *
@@ -17,6 +19,11 @@ public interface Shift extends EdgeFrame {
     public void setTraffic(String traffic);
     @Property("traffic")
     public String getTraffic();
+    
+    @Property("trafficRaw")
+    public void setTrafficRaw(Integer traffic);
+    @Property("trafficRaw")
+    public Integer getTrafficRaw();
     
     @Property("connection")
     public void setConnection(String connection);

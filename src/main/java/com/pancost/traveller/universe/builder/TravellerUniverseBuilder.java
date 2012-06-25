@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.frames.FramedGraph;
+import java.util.Iterator;
 
 /**
  *
@@ -43,6 +44,7 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
         
         PlanetList planets = createPlanets();
         createShifts(planets);
+        populateShiftTraffic(planets);
         graph.shutdown();
     }
 
@@ -115,13 +117,66 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
             }
         }
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        
-        /*graph.startTransaction();
-        GremlinPipeline gremlin = new GremlinPipeline(graph).out("shiftPlanets");
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);*/
     }
 
-    
+    private void populateShiftTraffic(PlanetList planets){
+        System.out.println("Generating shift traffic (raw).");
+        int currentMaxTraffic = 0;
+        for(Planet planet: planets.getPlanetList()){
+            int reachability = 0;
+            for(Planet withinThreeShifts : planet.getPlanetsInThreeShifts()){
+                ++reachability;
+            }
+            //System.out.println("Reachability for planet " + planet.getDesignation() + " is " + reachability);
+            for(Shift shift : planet.getShifts()){
+                Shift backwardsShift = null;
+                for(Shift potentialBackShift : shift.getToPlanet().getShifts()){
+                    if(potentialBackShift.getToPlanet().equals(planet)){
+                        backwardsShift = potentialBackShift;
+                        break;
+                    }
+                }
+                int existingTraffic;
+                if(backwardsShift.getTrafficRaw() == null){
+                    existingTraffic = 0;
+                }else{
+                    existingTraffic = backwardsShift.getTrafficRaw();
+                }
+                int newTraffic = existingTraffic + reachability;
+                shift.setTrafficRaw(newTraffic);
+                backwardsShift.setTrafficRaw(newTraffic);
+                if(newTraffic > currentMaxTraffic){
+                    currentMaxTraffic = newTraffic;
+                }
+            }
+        }
+        System.out.println("Generating shift traffic (abstracted).");
+        for(Planet planet: planets.getPlanetList()){
+            int trafficLevelSteps = (int) Math.floor(currentMaxTraffic/5);
+            for(Shift shift : planet.getShifts()){
+                int trafficLevel = (int) (shift.getTrafficRaw()/trafficLevelSteps);
+                switch(trafficLevel){
+                    case 0:
+                        shift.setTraffic("Very Low");
+                        break;
+                    case 1:
+                        shift.setTraffic("Low");
+                        break;
+                    case 2:
+                        shift.setTraffic("Medium");
+                        break;
+                    case 3:
+                        shift.setTraffic("High");
+                        break;
+                    case 4:
+                        shift.setTraffic("Very High");
+                        break;
+                    default:
+                        shift.setTraffic("Unknown");
+                }
+            }
+        }
+    }
 
     private Planet generatePlanet(TransactionalGraph graph, int currentPlanetNumber) {
         graph.startTransaction();
