@@ -7,6 +7,8 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.frames.FramedGraph;
+import com.tinkerpop.frames.FramedGraphFactory;
+import com.tinkerpop.frames.modules.gremlingroovy.GremlinGroovyModule;
 
 /**
  *
@@ -20,8 +22,9 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
 
     public TravellerUniverseBuilder(String dbPath){
         graph = new Neo4jGraph(dbPath);
-        framedGraph = new FramedGraph<>(graph);
-
+        FramedGraphFactory factory = new FramedGraphFactory(new GremlinGroovyModule());
+        framedGraph = factory.create(graph);
+        
         System.out.println("Cleaning up before creating a new universe.");
         for(Edge edge: graph.getEdges()){
             graph.removeEdge(edge);
@@ -29,7 +32,7 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
         for(Vertex vertex : graph.getVertices()){
             graph.removeVertex(vertex);
         }
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();
 
         generateSizeDescriptorNodes(graph);
         generateAtmosphereDescriptorNodes(graph);
@@ -49,15 +52,13 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
 
     private PlanetList createPlanets() {
         System.out.println("Creating new planets");
-        graph.startTransaction();
         PlanetList planets = framedGraph.addVertex(0, PlanetList.class);
         planets.setIndexed("YES");
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();
         for(int i = 0; i < NUM_PLANETS; ++i){
             Planet planet = generatePlanet(graph, i+1);//making this a 1-based index
-            graph.startTransaction();
             planets.addPlanetToList(planet);
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.commit();
         }
         return planets;
     }
@@ -65,7 +66,6 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
     private void createShifts(PlanetList planets) throws NumberFormatException {
         System.out.println("Creating trade routes");
         
-        graph.startTransaction();
         for(Planet planet: planets.getPlanetList()){
             int modifier = 0;
             PlanetStarport planetStarport = planet.getPlanetStarport();
@@ -116,7 +116,7 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
                 otherPlanet.addShiftPlanet(planet);
             }
         }
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();
     }
 
     private void populateShiftTraffic(PlanetList planets){
@@ -180,7 +180,6 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
     }
 
     private Planet generatePlanet(TransactionalGraph graph, int currentPlanetNumber) {
-        graph.startTransaction();
         Planet planet = framedGraph.addVertex(currentPlanetNumber, Planet.class);
         int planetSizeRoll = generatePlanetSize(planet);
         int atmosphereRoll = generatePlanetAtmosphere(planetSizeRoll, planet);
@@ -391,7 +390,7 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
         sb.append(lawRoll).append("-").append(techLevelRoll);
         String designation = sb.toString();
         planet.setDesignation(designation);
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();
         
         return planet;
     }

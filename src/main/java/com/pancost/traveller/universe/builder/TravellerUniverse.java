@@ -3,6 +3,8 @@ package com.pancost.traveller.universe.builder;
 import com.pancost.traveller.universe.frames.*;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.frames.FramedGraph;
+import com.tinkerpop.frames.FramedGraphFactory;
+import com.tinkerpop.frames.modules.gremlingroovy.GremlinGroovyModule;
 
 /**
  *
@@ -21,8 +23,8 @@ public abstract class TravellerUniverse implements TravellerConstants{
 
     protected void generateSizeDescriptorNodes(TransactionalGraph graph){
         System.out.println("Generating Size Descriptors");
-        FramedGraph<TransactionalGraph> framedGraph = new FramedGraph<>(graph);
-        graph.startTransaction();
+        FramedGraphFactory factory = new FramedGraphFactory(new GremlinGroovyModule());
+        FramedGraph<TransactionalGraph> framedGraph = factory.create(graph);
         size[0] = framedGraph.addVertex("800km", PlanetSize.class);
         size[0].setWorldSize("800km");
         size[0].setSurfaceGravity("0");
@@ -66,13 +68,13 @@ public abstract class TravellerUniverse implements TravellerConstants{
         size[10] = framedGraph.addVertex("1600km", PlanetSize.class);
         size[10].setWorldSize("16000km");
         size[10].setSurfaceGravity("1.4");
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();
     }
 
     protected void generateAtmosphereDescriptorNodes(TransactionalGraph graph){
         System.out.println("Generating Atmosphere Descriptors");
-        FramedGraph<TransactionalGraph> framedGraph = new FramedGraph<>(graph);
-        graph.startTransaction();
+        FramedGraphFactory factory = new FramedGraphFactory(new GremlinGroovyModule());
+        FramedGraph<TransactionalGraph> framedGraph = factory.create(graph);
         atmosphere[0] = framedGraph.addVertex("None", PlanetAtmosphere.class);
         atmosphere[0].setAtmosphere("None");
         atmosphere[0].setPressure("0.00");
@@ -152,13 +154,14 @@ public abstract class TravellerUniverse implements TravellerConstants{
         atmosphere[15].setAtmosphere("Unusual");
         atmosphere[15].setPressure("Varies");
         atmosphere[15].setSurvivalGearRequired("Varies");
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();
     }
 
     protected void generateTemperatureDescriptorNodes(TransactionalGraph graph){
         System.out.println("Generating Temperature Descriptors");
-        FramedGraph<TransactionalGraph> framedGraph = new FramedGraph<>(graph);
-        graph.startTransaction();
+        FramedGraphFactory factory = new FramedGraphFactory(new GremlinGroovyModule());
+        FramedGraph<TransactionalGraph> framedGraph = factory.create(graph);
+        
         temperature[0] = framedGraph.addVertex("Frozen", PlanetTemperature.class);
         temperature[0].setTemperatureType("Frozen");
         temperature[0].setAverageTemperature("-51C or less");
@@ -194,13 +197,13 @@ public abstract class TravellerUniverse implements TravellerConstants{
         temperature[13] = temperature[12];
         temperature[14] = temperature[12];
         temperature[15] = temperature[12];
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();
     }
 
     protected void generateHydrographicDescriptorNodes(TransactionalGraph graph){
         System.out.println("Generating Hydrographic Descriptors");
-        FramedGraph<TransactionalGraph> framedGraph = new FramedGraph<>(graph);
-        graph.startTransaction();
+        FramedGraphFactory factory = new FramedGraphFactory(new GremlinGroovyModule());
+        FramedGraph<TransactionalGraph> framedGraph = factory.create(graph);
         hydrographics[0] = framedGraph.addVertex("0%-5%", PlanetHydrographics.class);
         hydrographics[0].setPercentage("0%-5%");
         hydrographics[0].setDescription("Desert world");
@@ -244,13 +247,13 @@ public abstract class TravellerUniverse implements TravellerConstants{
         hydrographics[10] = framedGraph.addVertex("96%-100%", PlanetHydrographics.class);
         hydrographics[10].setPercentage("96%-100%");
         hydrographics[10].setDescription("Almost entirely water");
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();
     }
 
     protected void generatePopulationDescriptorNodes(TransactionalGraph graph){
         System.out.println("Generating Population Descriptors");
-        FramedGraph<TransactionalGraph> framedGraph = new FramedGraph<>(graph);
-        graph.startTransaction();
+        FramedGraphFactory factory = new FramedGraphFactory(new GremlinGroovyModule());
+        FramedGraph<TransactionalGraph> framedGraph = factory.create(graph);
         population[0] = framedGraph.addVertex("0", PlanetPopulation.class);
         population[0].setPopulationRange("0");
         population[0].setDescription("Uninhabited");
@@ -302,13 +305,13 @@ public abstract class TravellerUniverse implements TravellerConstants{
         population[11] = framedGraph.addVertex("1,000,000,000,000 and greater", PlanetPopulation.class);
         population[11].setPopulationRange("1,000,000,000,000 and greater");
         population[11].setDescription("World-city");
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();
     }
 
     protected void generateGovernmentDescriptorNodes(TransactionalGraph graph){
         System.out.println("Generating Government Descriptors");
-        FramedGraph<TransactionalGraph> framedGraph = new FramedGraph<>(graph);
-        graph.startTransaction();
+        FramedGraphFactory factory = new FramedGraphFactory(new GremlinGroovyModule());
+        FramedGraph<TransactionalGraph> framedGraph = factory.create(graph);
         government[0] = framedGraph.addVertex("None", PlanetGovernment.class);
         government[0].setType("None");
         government[0].setDescription("No government struction. In many cases, family bonds predominate.");
@@ -392,13 +395,13 @@ public abstract class TravellerUniverse implements TravellerConstants{
         government[13].setDescription("Ruling functions are performed by a religious organisation without regard to the specific individual needs of the citizenry.");
         government[13].setExamples("Cult, transcendent philosophy, psionic group mind");
         government[13].setCommonContraband("Varies");
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();
     }
     
     protected void generateLawDescriptorNodes(TransactionalGraph graph){
         System.out.println("Generating Law Descriptors");
-        FramedGraph<TransactionalGraph> framedGraph = new FramedGraph<>(graph);
-        graph.startTransaction();
+        FramedGraphFactory factory = new FramedGraphFactory(new GremlinGroovyModule());
+        FramedGraph<TransactionalGraph> framedGraph = factory.create(graph);
         law[0] = framedGraph.addVertex(null, PlanetLaw.class);
         law[0].setWeaponRestrictions("No Restrictions");
         law[0].setDrugRestrictions("No Restrictions");
@@ -478,13 +481,13 @@ public abstract class TravellerUniverse implements TravellerConstants{
         law[9].setTechnologyRestrictions("TL 3 items");
         law[9].setTravellerRestrictions("No offworlders permitted");
         law[9].setPsionicRestrictions("All psionics");
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();
     }
     
     protected void generateStarportDescriptorNodes(TransactionalGraph graph){
         System.out.println("Generating Starport Descriptors");
-        FramedGraph<TransactionalGraph> framedGraph = new FramedGraph<>(graph);
-        graph.startTransaction();
+        FramedGraphFactory factory = new FramedGraphFactory(new GremlinGroovyModule());
+        FramedGraph<TransactionalGraph> framedGraph = factory.create(graph);
         starport[0] = framedGraph.addVertex("No Starport", PlanetStarport.class);
         starport[0].setQuality("No Starport");
         starport[0].setBerthingCost("0");
@@ -533,13 +536,13 @@ public abstract class TravellerUniverse implements TravellerConstants{
         starport[11].setFacilities("Shipyard (all), repair");
         starport[11].setBases("Naval 8+, Scout 10+, Research 8+, TAS 4+, Imperial Consulate 6+");
         starport[12] = starport[11];
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();
     }
     
     protected void generateTechLevelDescriptorNodes(TransactionalGraph graph){
         System.out.println("Generating Tech Level Descriptors");
-        FramedGraph<TransactionalGraph> framedGraph = new FramedGraph<>(graph);
-        graph.startTransaction();
+        FramedGraphFactory factory = new FramedGraphFactory(new GremlinGroovyModule());
+        FramedGraph<TransactionalGraph> framedGraph = factory.create(graph);
         techLevel[0] = framedGraph.addVertex(null, PlanetTechLevel.class);
         techLevel[0].setDesignation("Primitive");
         techLevel[0].setDescription("No technology. TL 0 species have only disovered the simplest tools and principles, and are on par with Earth's Stone Age.");
@@ -619,6 +622,6 @@ public abstract class TravellerUniverse implements TravellerConstants{
         techLevel[19] = framedGraph.addVertex(null, PlanetTechLevel.class);
         techLevel[19].setDesignation("Unknown");
         techLevel[19].setDescription("Unknown");
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();
     }
 }
