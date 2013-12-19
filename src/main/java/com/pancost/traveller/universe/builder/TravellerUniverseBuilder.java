@@ -7,7 +7,6 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.frames.FramedGraph;
-import java.util.Iterator;
 
 /**
  *
@@ -16,11 +15,11 @@ import java.util.Iterator;
 public class TravellerUniverseBuilder extends TravellerUniverse{
 
     private static final int NUM_PLANETS = 500;
-    private Neo4jGraph graph;
-    private FramedGraph<Neo4jGraph> framedGraph;
+    private final Neo4jGraph graph;
+    private final FramedGraph<Neo4jGraph> framedGraph;
 
-    public TravellerUniverseBuilder(){
-        graph = new Neo4jGraph("C:/traveller/graphdb");
+    public TravellerUniverseBuilder(String dbPath){
+        graph = new Neo4jGraph(dbPath);
         framedGraph = new FramedGraph<>(graph);
 
         System.out.println("Cleaning up before creating a new universe.");
@@ -112,6 +111,7 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
                         }
                     }
                 }while(illegalShift);//This guarantees that they don't go back to the same place. Maybe I would want that though?
+                assert otherPlanet != null;
                 planet.addShiftPlanet(otherPlanet);
                 otherPlanet.addShiftPlanet(planet);
             }
@@ -137,6 +137,7 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
                     }
                 }
                 int existingTraffic;
+                assert backwardsShift != null;
                 if(backwardsShift.getTrafficRaw() == null){
                     existingTraffic = 0;
                 }else{
@@ -577,7 +578,13 @@ public class TravellerUniverseBuilder extends TravellerUniverse{
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        TravellerUniverseBuilder tub = new TravellerUniverseBuilder();
+        String dbPath;
+        if(args.length == 0 || args[0].isEmpty()){
+            System.err.println("Must provide the database path as an argument.");
+            return;
+        }
+        dbPath = args[0];
+        TravellerUniverseBuilder tub = new TravellerUniverseBuilder(dbPath);
     }
 
 }
